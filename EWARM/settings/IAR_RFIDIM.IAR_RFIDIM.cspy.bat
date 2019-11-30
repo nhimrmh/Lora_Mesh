@@ -25,7 +25,7 @@ if not "%~1" == "" goto debugFile
 
 @echo on 
 
-"C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\cspybat" -f "C:\Users\Keima\Desktop\LoraCube\IAR_RFIDIM\EWARM\settings\IAR_RFIDIM.IAR_RFIDIM.general.xcl" --backend -f "C:\Users\Keima\Desktop\LoraCube\IAR_RFIDIM\EWARM\settings\IAR_RFIDIM.IAR_RFIDIM.driver.xcl" 
+"C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\cspybat" -f "C:\Users\15122\Desktop\LoraIAR\EWARM\settings\IAR_RFIDIM.IAR_RFIDIM.general.xcl" --backend -f "C:\Users\15122\Desktop\LoraIAR\EWARM\settings\IAR_RFIDIM.IAR_RFIDIM.driver.xcl" 
 
 @echo off 
 goto end 
@@ -34,7 +34,7 @@ goto end
 
 @echo on 
 
-"C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\cspybat" -f "C:\Users\Keima\Desktop\LoraCube\IAR_RFIDIM\EWARM\settings\IAR_RFIDIM.IAR_RFIDIM.general.xcl" "--debug_file=%~1" --backend -f "C:\Users\Keima\Desktop\LoraCube\IAR_RFIDIM\EWARM\settings\IAR_RFIDIM.IAR_RFIDIM.driver.xcl" 
+"C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\cspybat" -f "C:\Users\15122\Desktop\LoraIAR\EWARM\settings\IAR_RFIDIM.IAR_RFIDIM.general.xcl" "--debug_file=%~1" --backend -f "C:\Users\15122\Desktop\LoraIAR\EWARM\settings\IAR_RFIDIM.IAR_RFIDIM.driver.xcl" 
 
 @echo off 
 :end

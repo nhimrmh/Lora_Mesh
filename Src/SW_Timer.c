@@ -6,10 +6,13 @@
 #include "SW_Timer.h"
 #include "My_type.h"
 #include "main.h"
+extern u8 flag_timer;
+extern u8 key1_count;
+extern u8 slave_count;
 typedef struct
 {
-    u16 countdown;
-    u16 time_setup;
+    u32 countdown;
+    u32 time_setup;
     u8 is_Running :1;
     u8 is_Done    :1;
   
@@ -20,7 +23,7 @@ SW_TIMER SWTimer[SUM_TIMER];
 
 void SW_TIMER_CLEAR(u8 Timer)
 {
-  SWTimer[Timer].countdown = 0xffff;
+  SWTimer[Timer].countdown = 0xffffffff;
   SWTimer[Timer].is_Running = 0;
   SWTimer[Timer].is_Done = 0;
   SWTimer[Timer].time_setup = 0;
@@ -43,7 +46,7 @@ void SW_TIMER_CREATE(u8 Timer, u16 TimeSetup)
   SWTimer[Timer].is_Done = 0;
 }
 
-void SW_TIMER_CREATE_FunCallBack(u8 Timer,u16 TimeSetup, SW_TIMER_CALLBACK fun)
+void SW_TIMER_CREATE_FunCallBack(u8 Timer,u32 TimeSetup, SW_TIMER_CALLBACK fun)
 {
   SWTimer[Timer].time_setup = TimeSetup;
   SWTimer[Timer].is_Running = 0;
@@ -61,25 +64,25 @@ void SW_TIMER_START(u8 Timer)
 
 void SW_TIMER_STOP(u8 Timer)
 {
-  SWTimer[Timer].countdown = 0xffff;
+  SWTimer[Timer].countdown = 0xffffffff;
   SWTimer[Timer].is_Running = 0;
 }
 
-void SW_TIMER_ISR(void)
+void SW_TIMER_ISR()
 {
   u8 i;
   for( i = 0; i < SUM_TIMER; i++)
   {
     if(SWTimer[i].is_Running)
     {
-      if((SWTimer[i].countdown > 0) && (SWTimer[i].countdown != 0xffff))
+      if((SWTimer[i].countdown > 0) && (SWTimer[i].countdown != 0xffffffff))
       {
         SWTimer[i].countdown--;
         if(SWTimer[i].countdown == 0)
         {
           SWTimer[i].is_Done = 1;
           SWTimer[i].is_Running = 0;
-          SWTimer[i].countdown = 0xffff;
+          SWTimer[i].countdown = 0xffffffff;
           if(SWTimer[i].func != NULL)
           {
             SWTimer[i].func();
@@ -116,7 +119,9 @@ u8 GET_SW_TIMER_IS_DONE(u8 Timer)
 
 void fun1(void)
 {
-  HAL_GPIO_TogglePin(RED_LED_GPIO_Port,RED_LED_Pin);
+  slave_count = 0;
+  flag_timer = 0;
+  key1_count = 3;	
 }
   
   

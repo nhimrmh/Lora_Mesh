@@ -68,6 +68,8 @@ void Error_Handler(void);
 #define DIO1_GPIO_Port GPIOA
 #define SPI_NSS_Pin GPIO_PIN_4
 #define SPI_NSS_GPIO_Port GPIOA
+#define DIO5_Pin GPIO_PIN_5
+#define DIO5_GPIO_Port GPIOB
 /* USER CODE BEGIN Private defines */
 
 /* USER CODE END Private defines */

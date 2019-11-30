@@ -26,3 +26,7 @@ u16 timer_measure_stop(void)
 	time_stop = HAL_GetTick();
 	return time_stop;
 }
+
+void HAL_SYSTICK_Callback(void){
+        SW_TIMER_ISR();
+}
