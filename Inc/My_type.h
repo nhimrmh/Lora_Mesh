@@ -62,19 +62,19 @@ typedef volatile unsigned char  const vuc8;   /* Read Only */
 #define TRUE   !FALSE
 
 /*FlagStatus, ITStatus, BitStatus*/
-#define RESET  0
-#define SET    !RESET
+//#define RESET  0
+//#define SET    !RESET
 
 /*FunctionalState */
-#define  DISABLE  0
-#define  ENABLE   !DISABLE
+//#define  DISABLE  0
+//#define  ENABLE   !DISABLE
 
 
 #define IS_FUNCTIONALSTATE_OK(VALUE) ( (VALUE == ENABLE) || (VALUE == DISABLE) )
 
 /*ErrorStatus*/
-#define  ERROR   0
-#define  SUCCESS !ERROR
+//#define  ERROR   0
+//#define  SUCCESS !ERROR
 
 #define U8_MAX     ((u8)255)
 #define S8_MAX     ((s8)127)

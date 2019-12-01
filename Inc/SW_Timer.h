@@ -6,6 +6,7 @@ typedef void (*SW_TIMER_CALLBACK)(void);
 typedef enum 
 {
   SW_TIMER1,
+  SW_TIMER_UNI,
   SUM_TIMER
 } SW_TIMER_ENUM;
 

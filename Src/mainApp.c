@@ -10,10 +10,10 @@
 #include "string.h"
 #include "SW_Timer.h"
 #include "logging.h"
-
+#include "Slave.h"
+#include "Master.h"
 #define printUSB(x) CDC_Transmit_FS((uint8_t*)x,strlen((char*)x))
 
-char strBuf[128];
 u16 SysTime;
 u16 time2_count;
 u16 key1_time_count;
@@ -35,15 +35,15 @@ s8 RSSI_Array[3][3];
 u8 count_1 = 0;
 u8 count_2 = 0;
 u8 count_3 = 0;
-u8 current_ptr = 0;
+
 u8 temp_count = 0;
-u8 key1_count;
+LoraMode myLoraMode;
 char* slave_id;
 s8 rssi_value;
-u8 uni_or_broad = 0;
-u8 slave_count;
 u8 irq_mainapp = 0;
 u8 flag_timer = 0;
+u8 flag_first_time = 0;
+
 /*key1_count = 0----------->lora master
 key1_count = 1----------->lora slaver
 */
@@ -87,8 +87,7 @@ void mainApp()
 	u16 i=0;//,j,k=0,g;
 
 	SysTime = 0;
-	operation_flag = 0x00;
-	key1_count = 0x00;
+	operation_flag = 0x00;	
 	mode = 0x01;//lora mode
 	Freq_Sel = 0x00;//433M
 	Power_Sel = 0x00;//
@@ -114,6 +113,11 @@ void mainApp()
 	/*
         First initialization for Lora 
 	*/
+        
+        for(uint32_t i = 1; i < 100; i++){
+          myLoraMaster.status_prev[i] = 0;
+        }
+        
 	u8 start = 0;
 	u8 stop = 0;				
 	
@@ -124,167 +128,131 @@ void mainApp()
         /*
 	Choose mode
 	*/ 
-        slave_id = "3";
-	key1_count = 3;
-	slave_count = 0;
+        slave_id = "2"; //Id of slave
+	myLoraMode.mode = 3; //Mode 1: Slave, 3:Master  
+        myLoraMode.uni_or_broad = 0;
+	myLoraMode.slave_count = 0;
 	while (1)
 	{		
-		switch(key1_count)
+		switch(myLoraMode.mode)
 		{
 			case 0://lora master Tx
                         {	
-                          if(uni_or_broad == 1){
-                            HAL_Delay(100000 * atoi(slave_id));
-                            u8 Tx_Packet[20];					
-                            sprintf((char*)sx1276_7_8Data,"%s_%d\n", slave_id, rssi_value);		
-                            sprintf((char*)Tx_Packet, "Data sent: %s", (char*)sx1276_7_8Data);														
-                            printUSB((char*)Tx_Packet);
-                            Switch_To_Tx();																											
-                            Send_Tx_Packet((u8*)sx1276_7_8Data, 20);																								
-                            Switch_To_Rx();																			
-                            key1_count = 1;	
-                          }
-                          else{
-                            u8 Tx_Packet[20];					
-                            sprintf((char*)sx1276_7_8Data,"%s_%d\n", slave_id, rssi_value);		
-                            sprintf((char*)Tx_Packet, "Data sent: %s", (char*)sx1276_7_8Data);														
-                            printUSB((char*)Tx_Packet);
-                            Switch_To_Tx();																											
-                            Send_Tx_Packet((u8*)sx1276_7_8Data, 20);																								
-                            Switch_To_Rx();																			
-                            key1_count = 1;	
-                          }
+                          Slave_Send_Response(myLoraMode.uni_or_broad, slave_id);
                         }		
 			break;
 				
 			case 1://lora slaver Rx continuous
 			{									
-                          if(Indicate_Rx_Packet(slave_id, 1) == 1) //Receive a legal packet
-                          {		
-                            if(strncmp((char*)(RxData + current_ptr),slave_id,1) == 0){																
-                                rssi_value = sx1276_7_8_LoRaReadRSSI();						
-                                sprintf(strBuf,"Data received: %s\n",(char*)(RxData + current_ptr));		
-                                current_ptr++;
-                                if(current_ptr == 3) current_ptr = 0;
-                                printUSB(strBuf);										
-                                key1_count = 0;                                                        
-                                uni_or_broad = 0;
-                            }
-                            if(strncmp((char*)(RxData + current_ptr),"a",1) == 0){																
-                                rssi_value = sx1276_7_8_LoRaReadRSSI();						
-                                sprintf(strBuf,"Data received: %s\n",(char*)(RxData + current_ptr));		
-                                current_ptr++;
-                                if(current_ptr == 3) current_ptr = 0;
-                                printUSB(strBuf);										
-                                key1_count = 0;             
-                                uni_or_broad = 1;
-                            }
-                          }                                          
+                          Slave_Receive_Data(slave_id);
                         }		
 			break;	
                         
                         case 3://lora master Tx
-                        {	                          
-                          if(HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_6) == 1){
-                            HAL_Delay(100000 * 0.5);
-                            u8 Tx_Packet[20];					
-                            sprintf((char*)sx1276_7_8Data,"all\n");		
-                            sprintf((char*)Tx_Packet, "Data sent: %s", (char*)sx1276_7_8Data);														
-                            printUSB((char*)Tx_Packet);
-                            Switch_To_Tx();																											
-                            Send_Tx_Packet((u8*)sx1276_7_8Data, 20);																								
-                            Switch_To_Rx();																			
-                            key1_count = 4;	
-                            uni_or_broad = 1;
-                          }
-                          if(HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_7) == 1 || HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_8) == 1 || HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_9) == 1){
-                            if(HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_7) == 1){
-                              slave_id = "1";
-                              uni_or_broad = 0;
-                            }
-                            else if(HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_8) == 1){
-                              slave_id = "2";
-                              uni_or_broad = 0;
-                            }
-                            if(HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_9) == 1){
-                              slave_id = "3";
-                              uni_or_broad = 0;
-                            }
-                            u8 Tx_Packet[20];					
-                            sprintf((char*)sx1276_7_8Data,"%s_1\n", slave_id);		
-                            sprintf((char*)Tx_Packet, "Data sent: %s", (char*)sx1276_7_8Data);														
-                            printUSB((char*)Tx_Packet);
-                            Switch_To_Tx();																											
-                            Send_Tx_Packet((u8*)sx1276_7_8Data, 20);																								
-                            Switch_To_Rx();																			
-                            key1_count = 4;	
-                          }                                                    
+                        {	
+                          Master_Send_Data(slave_id);                    
                         }		
 			break;
 				
 			case 4://lora slaver Rx continuous
-			{	
+			{	                         
+                          
                           if(flag_timer == 0){
                             flag_timer = 1;
                             SW_TIMER_CALLBACK temp = fun1;	
-                            SW_TIMER_CREATE_FunCallBack(SW_TIMER1, 500000, temp);
+                            SW_TIMER_CREATE_FunCallBack(SW_TIMER1, 300000, temp);
                             SW_TIMER_START(SW_TIMER1);
                           }
                           if(Indicate_Rx_Packet("10", 0) == 1) //Receive a legal packet
                           {		
                             flag_timer = 0;
-                            
-                            if(strncmp((char*)(RxData + current_ptr),"1",1) == 0){
-                                current_ptr++;
-                                if(current_ptr == 3) current_ptr = 0;
-                                slave_count++;
-                                rssi_value = sx1276_7_8_LoRaReadRSSI();	
-                                RSSI_Array[0][count_1] = rssi_value;                                                                
-                                count_1++;
-                                if(count_1 == 3) count_1 = 0;
-                                sprintf(strBuf,"\n ID  1   2   3 \n    ___________\n\n 1 |%3d %3d %3d|\n 2 |%3d %3d %3d|\n 3 |%3d %3d %3d|\n    ___________\n",
-                                RSSI_Array[0][0],RSSI_Array[0][1],RSSI_Array[0][2], RSSI_Array[1][0],RSSI_Array[1][1],RSSI_Array[1][2]
-                                ,RSSI_Array[2][0],RSSI_Array[2][1],RSSI_Array[2][2]);				
-                                printUSB(strBuf);	                                
+                            SW_TIMER_CLEAR(SW_TIMER1);
+                            myLoraMaster.uni_sent = 1;
+                            u8 store_packet[20];
+                            u8 store_id[8];                            
+                            for(uint32_t i = 0; i < 7; i++){
+                                    store_id[i] = 0;
                             }
-                            else if(strncmp((char*)(RxData + current_ptr),"2",1) == 0){	
-                                current_ptr++;
-                                if(current_ptr == 3) current_ptr = 0;
-                                slave_count++;
-                                rssi_value = sx1276_7_8_LoRaReadRSSI();	
-                                RSSI_Array[1][count_2] = rssi_value;                                                                
-                                count_2++;
-                                if(count_2 == 3) count_2 = 0;
-                                sprintf(strBuf,"\n ID  1   2   3 \n    ___________\n\n 1 |%3d %3d %3d|\n 2 |%3d %3d %3d|\n 3 |%3d %3d %3d|\n    ___________\n",
-                                RSSI_Array[0][0],RSSI_Array[0][1],RSSI_Array[0][2], RSSI_Array[1][0],RSSI_Array[1][1],RSSI_Array[1][2]
-                                ,RSSI_Array[2][0],RSSI_Array[2][1],RSSI_Array[2][2]);				
-                                printUSB(strBuf);	                                
-                            }
-                            else if(strncmp((char*)(RxData + current_ptr),"3",1) == 0){	
-                                current_ptr++;
-                                if(current_ptr == 3) current_ptr = 0;
-                                slave_count++;
-                                rssi_value = sx1276_7_8_LoRaReadRSSI();	
-                                RSSI_Array[2][count_3] = rssi_value;                                
-                                count_3++;
-                                if(count_3 == 3) count_3 = 0;
-                                sprintf(strBuf,"\n ID  1   2   3 \n    ___________\n\n 1 |%3d %3d %3d|\n 2 |%3d %3d %3d|\n 3 |%3d %3d %3d|\n    ___________\n",
-                                RSSI_Array[0][0],RSSI_Array[0][1],RSSI_Array[0][2], RSSI_Array[1][0],RSSI_Array[1][1],RSSI_Array[1][2]
-                                ,RSSI_Array[2][0],RSSI_Array[2][1],RSSI_Array[2][2]);				
-                                printUSB(strBuf);	                                
-                            }                            
-                            if(uni_or_broad == 1){
-                              if(slave_count == 2){
-                                key1_count = 3;	
-                                slave_count = 0;
+                            strncpy((char*)store_id,(char*)(RxData + myLoraPtr.current_ptr),1);
+                            myLoraMaster.status[atoi((char*)store_id)] = 1;
+                            strcpy((char*)store_packet, (char*)(RxData + myLoraPtr.current_ptr));
+                            myLoraPtr.current_ptr++;
+                            if(myLoraPtr.current_ptr == 3) myLoraPtr.current_ptr = 0;
+                            myLoraMode.slave_count++;
+                            rssi_value = sx1276_7_8_LoRaReadRSSI();	
+                            sprintf(myLoraMode.strBuf,"Node 1.%s connected with RSSI: %d\n", (char*)store_id, rssi_value);				
+                            printUSB(myLoraMode.strBuf);	                                                            
+                                                     
+                            if(myLoraMode.uni_or_broad == 1){
+                              if(myLoraMode.slave_count == 7){
+                                myLoraMode.mode = 3;	
+                                myLoraMode.slave_count = 0;
                               }
                             }
-                            else{                              
-                              key1_count = 3;	                              
+                            else{       
+                              SW_TIMER_CLEAR(SW_TIMER1);
+                              myLoraMode.mode = 7;
                             }
                           }                                                       
                         }		
 			break;	
+                        
+                        case 5:
+                        {
+                          for(uint32_t i = 1; i < 100; i++){
+                            if(myLoraMaster.status_prev[i] == 1 && myLoraMaster.status[i] == 0){
+                              sprintf(myLoraMode.strBuf,"Node 1.%d disconnected\n", i);				
+                              printUSB(myLoraMode.strBuf);	                                                                                          
+                            }
+                          }
+                          for(uint32_t i = 1; i < 100; i++){
+                            myLoraMaster.status_prev[i] = myLoraMaster.status[i];
+                          }                                                    
+                          myLoraMode.mode = 3; 
+                        }
+                        break;
+                        
+                        case 6:
+                        {
+                          if(myLoraMaster.uni_received == 0){
+                            myLoraMaster.uni_received = 1;
+                            sprintf(myLoraMode.strBuf,"Node 1.%s disconnected\n", slave_id);				
+                            printUSB(myLoraMode.strBuf);	
+                            myLoraMode.mode = 7;
+                          }
+                        }
+                        break;
+                        
+                        case 7:     
+                          flag_timer = 0;
+                          if(atoi(slave_id) == 1){
+                            if(HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_6) == 0){
+                                myLoraMaster.sent = 0;
+                            }
+                          }
+                          if(atoi(slave_id) == 2){
+                            if(HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_7) == 0){
+                                myLoraMaster.sent = 0;
+                            }
+                          }
+                          if(atoi(slave_id) == 3){
+                            if(HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_8) == 0){
+                                myLoraMaster.sent = 0;
+                            }
+                          }
+                          if(atoi(slave_id) == 4){
+                            if(HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_9) == 0){
+                                myLoraMaster.sent = 0;
+                            }
+                          }
+                          if(myLoraMaster.sent == 0){
+                            if(HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_5) == 1 || 
+                               HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_6) == 1 || HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_7) == 1
+                               || HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_8) == 1 || HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_9) == 1){
+                              myLoraMode.mode = 3;
+                            }
+                          }
+                        break;
 	}
       }
 }

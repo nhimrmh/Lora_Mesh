@@ -1208,6 +1208,12 @@
                 <name>$PROJ_DIR$\..\Src\mainApp.c</name>
             </file>
             <file>
+                <name>$PROJ_DIR$\..\Src\Master.c</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\..\Src\Slave.c</name>
+            </file>
+            <file>
                 <name>$PROJ_DIR$\..\Src\spi.c</name>
             </file>
             <file>

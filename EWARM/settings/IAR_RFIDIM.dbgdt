@@ -917,7 +917,7 @@
                     <item>slave_id</item>
                     <item>slave_id</item>
                     <item>temp</item>
-                    <item></item>
+                    <item />
                 </expressions>
                 <col-names>
                     <item>Expression</item>

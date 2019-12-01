@@ -93,7 +93,7 @@ void sx1276_7_8_Config_Init(void);
 
 void sx1276_7_8_Reset(void){
 	HAL_GPIO_WritePin(Reset_GPIO_Port,Reset_Pin,GPIO_PIN_RESET);
-	HAL_Delay(10);
+	HAL_Delay(10 * 100000);
 	HAL_GPIO_WritePin(Reset_GPIO_Port,Reset_Pin,GPIO_PIN_SET);
 }
 
@@ -219,7 +219,7 @@ u8 Indicate_Rx_Packet(char* slave_id, u8 m_or_s)
   if(HAL_GPIO_ReadPin(nIrq_GPIO_Port,nIrq_Pin) == 1)
   {		
     for(i=0;i<19;i++){     
-			RxData[free_ptr][i] = 0x00;
+			RxData[free_ptr][i] = 0;
 		}
     result = Read_Rx_Packet((char*)RxData, 20, slave_id, m_or_s);
 		sx1276_7_8_LoRaClearIrq();		
@@ -248,7 +248,7 @@ u8 Read_Rx_Packet(char* Rx_Packet, u8 length, char* slave_id, u8 m_or_s){
 		if(packet_size <= length){
                   u8 temp[20];
                   for(u8 i=0;i<19;i++){     
-			temp[i] = 0x00;
+			temp[i] = 0;
                   }
                   SPIBurstRead(0x00, (char*)temp, packet_size);	
                   if(strncmp((char*)temp,slave_id,1) == 0 || m_or_s == 0){
@@ -349,7 +349,7 @@ u8 Wait_Tx_Done(){
 void sx1276_7_8_Config_Init(void)
 {
   sx1276_7_8_Sleep();                                      //Change modem mode Must in Sleep mode
-	HAL_Delay(15); 
+	HAL_Delay(15 * 100000); 
 	sx1276_7_8_EntryLoRa();	
 
 	BurstWrite(LR_RegFrMsb,sx1276_7_8FreqTbl[Freq_Sel],3);  //setting frequency parameter

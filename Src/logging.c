@@ -2,6 +2,10 @@
 #include "usbd_cdc_if.h"
 #include "My_type.h"
 #include "logging.h"
+
+TxPacket myTxPacket;
+LoraPtr myLoraPtr;
+
 void print_data( char * x, u16 lenx)
 {
   u8 y[64];

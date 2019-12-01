@@ -6,9 +6,13 @@
 #include "SW_Timer.h"
 #include "My_type.h"
 #include "main.h"
+#include "mainApp.h"
+#include "Master.h"
 extern u8 flag_timer;
 extern u8 key1_count;
 extern u8 slave_count;
+extern u8 uni_or_broad;
+extern u8 uni_sent;
 typedef struct
 {
     u32 countdown;
@@ -119,9 +123,19 @@ u8 GET_SW_TIMER_IS_DONE(u8 Timer)
 
 void fun1(void)
 {
-  slave_count = 0;
-  flag_timer = 0;
-  key1_count = 3;	
+  if(myLoraMode.uni_or_broad == 1){
+    myLoraMode.slave_count = 0;
+    flag_timer = 0;
+    myLoraMode.mode = 5;	
+  }
+  else{
+    if(myLoraMaster.uni_sent == 0){
+      myLoraMode.mode = 6;
+    }
+    else{
+      myLoraMode.mode = 7;
+    }
+  }
 }
   
   
