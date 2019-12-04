@@ -13,100 +13,20 @@
 #include "Slave.h"
 #include "Master.h"
 #include "stdio.h"
-u16 SysTime;
-u16 time2_count;
-u16 key1_time_count;
-u16 key2_time_count;
-u8 rf_rx_packet_length;
 
-u8 mode;//lora--1/FSK--0
-u8 Freq_Sel;//
-u8 Power_Sel;//
-u8 Lora_Rate_Sel;//
-u8 BandWide_Sel;//
-uint32_t count = 0; 
-uint32_t number_of_ack = 0;
-uint32_t number_of_noack = 0;
-u8 Fsk_Rate_Sel;//
-u8 count_idx = 1;
-u8 flag_idx = 0;
-s8 RSSI_Array[3][3];
-u8 count_1 = 0;
-u8 count_2 = 0;
-u8 count_3 = 0;
-
-u8 temp_count = 0;
 LoraMode myLoraMode;
-s8 rssi_value;
-u8 irq_mainapp = 0;
-u8 flag_first_time = 0;
+u8 mode;//lora--1/FSK--0
 
-/*key1_count = 0----------->lora master
-key1_count = 1----------->lora slaver
-*/
-u8 time_flag;
-/*{
-bit0 time_1s;
-bit1 time_2s;
-bit2 time_50ms;
-bit3 ;
-bit4 ;
-bit5 ;
-bit6 ;
-bit7 ;
-}*/
-u8	operation_flag;
-/*typedef struct
-{
-	uchar	:RxPacketReceived-0;
-	uchar	:
-	uchar	:
-	uchar	:
-	uchar	:
-	uchar	:key2_down;
-	uchar	:key1_down;
-	uchar	;
-} operation_flag;*/
-u8 key_flag;
-/*{
-	uchar	:key1_shot_down;
-	uchar	:key1_long_down;
-	uchar	:key2_short_down;
-	uchar	:key2_long_down
-	uchar	:
-	uchar	:;
-	uchar	:;
-	uchar	;
-}*/
-uint32_t tick_temp;
+u8 irq_mainapp = 0;
+
 void mainApp()
 {
 	u16 i=0;//,j,k=0,g;
-
-	SysTime = 0;
-	operation_flag = 0x00;	
+	
 	mode = 0x01;//lora mode
-	Freq_Sel = 0x00;//433M
-	Power_Sel = 0x00;//
-	Lora_Rate_Sel = 0x00;// Spreading Factor config, 0x00 = 6
-	BandWide_Sel = 0x09;
-	Fsk_Rate_Sel = 0x00;
 	
-	//RED_LED_L();
-	//HAL_Delay(500);
-	//RED_LED_H();
-
 	sx1276_7_8_Reset();
-	
-	/*
-	Init RSSI table with all values are 0
-	*/
-	for(uint32_t i = 0; i < 3; i++){
-		for(uint32_t j = 0; j < 3; j++){
-			RSSI_Array[i][j] = 0;
-		}
-	}
-	
+		
 	/*
         First initialization for Lora 
 	*/
@@ -117,7 +37,7 @@ void mainApp()
         
 	u8 start = 0;
 	u8 stop = 0;				
-	
+	Lora_1278_Init();
 	sx1276_7_8_Config_Init();                                         //setting base parameter
 
 	Switch_To_Rx();	

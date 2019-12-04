@@ -17,184 +17,197 @@
 #define RED_LED_H()					HAL_GPIO_WritePin(RED_LED_GPIO_Port,RED_LED_Pin,GPIO_PIN_SET)//PD_ODR |= 0x40//PD6
 #define RED_LED_L()					HAL_GPIO_WritePin(RED_LED_GPIO_Port,RED_LED_Pin,GPIO_PIN_RESET)//PD_ODR &= 0xbf
 
-#define Get_KEY2()					(PD_IDR & 0x10) == 0x10//PD4
-#define Get_KEY1()					(PD_IDR & 0x08) == 0x08//PD3
 #define MAX_QUEUE_LENGTH 3
 #define BROADCAST_CHARACTER "a"
 #define SLAVE_IS_RECEIVING 1
 #define MASTER_IS_RECEIVING 0
 #define printUSB(x) CDC_Transmit_FS((uint8_t*)x,strlen((char*)x))
 ///////////////////////////////////////////////// LoRa mode //////////////////////////////////////////////////
-//Error Coding rate (CR)setting
-#define CR_4_5
-//#define CR_4_6    0
-//#define CR_4_7    0
-//#define CR_4_8    0
 
-#ifdef   CR_4_5
-  #define CR                    0x01                                       // 4/5
-#else
-  #ifdef   CR_4_6
-    #define CR                  0x02                                     // 4/6
-  #else
-    #ifdef   CR_4_7
-      #define CR                0x03                                   // 4/7
-    #else
-      #ifdef   CR_4_8
-        #define CR              0x04                                 // 4/8
-      #endif
-    #endif
-  #endif
-#endif
 
-//CRC Enable
-#define SPI_CRC_EN
-
-#ifdef  SPI_CRC_EN
-  #define SPI_CRC               0x01                                       //CRC Enable
-#else
-  #define SPI_CRC               0x00
-#endif
-
-//RFM98 Internal registers Address
-/********************Lroa mode***************************/
-#define LR_RegFifo              0x00
-// Common settings
-#define LR_RegOpMode            0x01
-#define LR_RegFrMsb             0x06
-#define LR_RegFrMid             0x07
-#define LR_RegFrLsb             0x08
-// Tx settings
-#define LR_RegPaConfig          0x09
-#define LR_RegPaRamp            0x0A
-#define LR_RegOcp               0x0B
-// Rx settings
-#define LR_RegLna               0x0C
-// LoRa registers
-#define LR_RegFifoAddrPtr       0x0D
-#define LR_RegFifoTxBaseAddr    0x0E
-#define LR_RegFifoRxBaseAddr    0x0F
-#define LR_RegFifoRxCurrentaddr 0x10
-#define LR_RegIrqFlagsMask      0x11
-#define LR_RegIrqFlags          0x12
-#define LR_RegRxNbBytes         0x13
-#define LR_RegRxHeaderCntValueMsb                   0x14
-#define LR_RegRxHeaderCntValueLsb                   0x15
-#define LR_RegRxPacketCntValueMsb                   0x16
-#define LR_RegRxPacketCntValueLsb                   0x17
-#define LR_RegModemStat         0x18
-#define LR_RegPktSnrValue       0x19
-#define LR_RegPktRssiValue      0x1A
-#define LR_RegRssiValue         0x1B
-#define LR_RegHopChannel        0x1C
-#define LR_RegModemConfig1      0x1D
-#define LR_RegModemConfig2      0x1E
-#define LR_RegSymbTimeoutLsb    0x1F
-#define LR_RegPreambleMsb       0x20
-#define LR_RegPreambleLsb       0x21
-#define LR_RegPayloadLength     0x22
-#define LR_RegMaxPayloadLength  0x23
-#define LR_RegHopPeriod         0x24
-#define LR_RegFifoRxByteAddr    0x25
-
+//SX1278 Internal registers Address
+/********************Lora Registers***************************/
+#define Lora_1278_RegFifo                                  0x00
+#define Lora_1278_RegOpMode                                0x01
+#define Lora_1278_RegFrMsb                                 0x06
+#define Lora_1278_RegFrMid                                 0x07
+#define Lora_1278_RegFrLsb                                 0x08
+#define Lora_1278_RegPaConfig                              0x09
+#define Lora_1278_RegPaRamp                                0x0A
+#define Lora_1278_RegOcp                                   0x0B
+#define Lora_1278_RegLna                                   0x0C
+#define Lora_1278_RegFifoAddrPtr                           0x0D
+#define Lora_1278_RegFifoTxBaseAddr                        0x0E
+#define Lora_1278_RegFifoRxBaseAddr                        0x0F
+#define Lora_1278_RegFifoRxCurrentAddr                     0x10
+#define Lora_1278_RegIrqFlagsMask                          0x11
+#define Lora_1278_RegIrqFlags                              0x12
+#define Lora_1278_RegRxNbBytes                             0x13
+#define Lora_1278_RegRxHeaderCntValueMsb                   0x14
+#define Lora_1278_RegRxHeaderCntValueLsb                   0x15
+#define Lora_1278_RegRxPacketCntValueMsb                   0x16
+#define Lora_1278_RegRxPacketCntValueLsb                   0x17
+#define Lora_1278_RegModemStat                             0x18
+#define Lora_1278_RegPktSnrValue                           0x19
+#define Lora_1278_RegPktRssiValue                          0x1A
+#define Lora_1278_RegRssiValue                             0x1B
+#define Lora_1278_RegHopChannel                            0x1C
+#define Lora_1278_RegModemConfig1                          0x1D
+#define Lora_1278_RegModemConfig2                          0x1E
+#define Lora_1278_RegSymbTimeoutLsb                        0x1F
+#define Lora_1278_RegPreambleMsb                           0x20
+#define Lora_1278_RegPreambleLsb                           0x21
+#define Lora_1278_RegPayloadLength                         0x22
+#define Lora_1278_RegMaxPayloadLength                      0x23
+#define Lora_1278_RegHopPeriod                             0x24
+#define Lora_1278_RegFifoRxByteAddr                        0x25
+#define Lora_1278_RegModemConfig3                          0x26
+#define Lora_1278_RegFeiMsb                                0x28
+#define Lora_1278_RegFeiMid                                0x29
+#define Lora_1278_RegFeiLsb                                0x2A
+#define Lora_1278_RegRssiWideband                          0x2C
+#define Lora_1278_RegDetectOptimize                        0x31
+#define Lora_1278_RegInvertIQ                              0x33
+#define Lora_1278_RegDetectionThreshold                    0x37
+#define Lora_1278_RegSyncWord                              0x39
 // I/O settings
-#define REG_LR_DIOMAPPING1      0x40
-#define REG_LR_DIOMAPPING2      0x41
+#define Lora_1278_RegDioMapping1                           0x40
+#define Lora_1278_RegDioMapping2                           0x41
 // Version
-#define REG_LR_VERSION          0x42
+#define Lora_1278_RegVersion                               0x42
 // Additional settings
-#define REG_LR_PLLHOP           0x44
-#define REG_LR_TCXO             0x4B
-#define REG_LR_PADAC            0x4D
-#define REG_LR_FORMERTEMP       0x5B
-
-#define REG_LR_AGCREF           0x61
-#define REG_LR_AGCTHRESH1       0x62
-#define REG_LR_AGCTHRESH2       0x63
-#define REG_LR_AGCTHRESH3       0x64
-
-/********************FSK/ook mode***************************/
-#define  RegFIFO  	 	0x00				//FIFO
-#define  RegOpMode 	 	0x01
-#define  RegBitRateMsb 		0x02
-#define  RegBitRateLsb 		0x03
-#define  RegFdevMsb	 	0x04
-#define  RegFdevLsb	 	0x05
-#define  RegFreqMsb	 	0x06
-#define  RegFreqMid	 	0x07
-#define  RegFreqLsb   		0x08
-#define	 RegPaConfig		0x09
-#define  RegPaRamp		0x0a
-#define  RegOcp			0x0b
-#define  RegLna			0x0c
-#define  RegRxConfig		0x0d
-#define  RegRssiConfig		0x0e
-#define  RegRssiCollision       0x0f
-#define  RegRssiThresh		0x10
-#define  RegRssiValue		0x11
-#define  RegRxBw		0x12
-#define  RegAfcBw		0x13
-#define  RegOokPeak		0x14
-#define  RegOokFix		0x15
-#define  RegOokAvg		0x16
-#define  RegAfcFei		0x1a
-#define  RegAfcMsb		0x1b
-#define  RegAfcLsb		0x1c
-#define  RegFeiMsb		0x1d
-#define  RegFeiLsb		0x1e
-#define  RegPreambleDetect	0x1f
-#define  RegRxTimeout1		0x20
-#define  RegRxTimeout2		0x21
-#define  RegRxTimeout3		0x22
-#define  RegRxDelay		0x23
-#define  RegOsc  	 	0x24
-#define  RegPreambleMsb		0x25
-#define  RegPreambleLsb		0x26
-#define  RegSyncConfig		0x27
-#define  RegSyncValue1		0x28
-#define  RegSyncValue2		0x29
-#define  RegSyncValue3		0x2a
-#define  RegSyncValue4		0x2b
-#define  RegSyncValue5		0x2c
-#define  RegSyncValue6		0x2d
-#define  RegSyncValue7		0x2e
-#define  RegSyncValue8		0x2f
-#define  RegPacketConfig1	0x30
-#define  RegPacketConfig2	0x31
-#define  RegPayloadLength	0x32
-#define  RegNodeAdrs		0x33
-#define  RegBroadcastAdrs	0x34
-#define  RegFifoThresh		0x35
-#define  RegSeqConfig1		0x36
-#define  RegSeqConfig2		0x37
-#define  RegTimerResol		0x38
-#define  RegTimer1Coef		0x39
-#define  RegTimer2Coef		0x3a
-#define  RegImageCal		0x3b
-#define  RegTemp		0x3c
-#define  RegLowBat		0x3d
-#define  RegIrqFlags1		0x3e
-#define  RegIrqFlags2		0x3f
-#define  RegDioMapping1		0x40
-#define  RegDioMapping2		0x41
-#define  RegVersion		0x42
-#define	 RegPllHop		0x44
-#define  RegPaDac		0x4d
-#define	 RegBitRateFrac		0x5d
+#define Lora_1278_RegPllHop                                0x44
+#define Lora_1278_RegTcxo                                  0x4B
+#define Lora_1278_RegPaDac                                 0x4D
+#define Lora_1278_RegFormerTemp                            0x5B
+#define Lora_1278_RegAgcRef                                0x61
+#define Lora_1278_RegAgcThresh1                            0x62
+#define Lora_1278_RegAgcThresh2                            0x63
+#define Lora_1278_RegAgcThresh3                            0x64
+#define Lora_1278_RegPll                                   0x70
+/********************Lora mode***************************/
+// Lora mode
+#define LORA_ON                                            0x88
+#define LORA_SLEEP                                         0x08
+#define LORA_STDBY                                         0x89
+#define LORA_FSTX                                          0x8A
+#define LORA_TX                                            0x8B
+#define LORA_FSRX                                          0x8C
+#define LORA_RXCONTINUOUS                                  0x8D
+#define LORA_RXSINGLE                                      0x8E
+#define LORA_CAD                                           0x8F
+// Frequency Mode
+#define F_434_MSB                                          0x6C
+#define F_434_MID                                          0x80
+#define F_434_LSB                                          0x00
+#define LORA_433MHZ                                        0
+static const u8 SX1278_Frequency[1][3] = 
+{ 
+  { 0x6C, 0x80, 0x00 },  // 433 Mhz
+};
+// OutputPower Mode when PA_BOOST enable
+#define OP_20_dBm                                          0xFF  
+#define OP_17_dBm                                          0xFC
+#define OP_14_dBm                                          0xF9
+#define OP_11_dBm                                          0xF6
+// SpreadFactor Mode
+#define SF_6                                               6
+#define SF_7                                               7
+#define SF_8                                               8
+#define SF_9                                               9
+#define SF_10                                              10
+#define SF_11                                              11
+#define SF_12                                              12
+// BandWidth Mode
+#define BW_7_kHz                                           0
+#define BW_10_kHz                                          1
+#define BW_15_kHz                                          2
+#define BW_20_kHz                                          3
+#define BW_31_kHz                                          4
+#define BW_41_kHz                                          5
+#define BW_62_kHz                                          6
+#define BW_125_kHz                                         7
+#define BW_250_kHz                                         8
+#define BW_500_kHz                                         9
+// CodingRate Mode
+#define CR_4_5                                             0x01
+#define CR_4_6                                             0x02
+#define CR_4_7                                             0x03
+#define CR_4_8                                             0x04
+// CRC check
+#define CRC_ENABLE                                         0x01
+#define CRC_DISABLE                                        0x00
+// OCP - Overload Current Protection for PA
+#define OCP_ENABLE                                         0x2B                 // OCPTrim default 100mA
+#define OCP_DISABLE                                        0x0B                 
+// LNA gain setting with Boost on
+#define LNA_G1                                             0x23                 // Maximum gain
+#define LNA_G2                                             0x43
+#define LNA_G3                                             0x63
+#define LNA_G4                                             0x83
+#define LNA_G5                                             0xA3
+#define LNA_G6                                             0xC3                 // Minimum gain
+// Header Mode 
+#define EXPLICIT_MODE                                      0x00
+#define IMPLICIT_MODE                                      0x01
+// Symb Timeout
+#define RX_TIMEOUT_MSB                                     0x03                 // Max is 3
+#define RX_TIMEOUT_LSB                                     0xFF                 // Timeout = RX_TIMEOUT.Ts
+// LoRa Detection Optimize
+#define DETECTION_OPTIMIZE_SF6                             0xC5 
+#define DETECTION_OPTIMIZE_SF7_12                          0xC3                 // Reg default
+// LoRa Detection Threshold
+#define DETECTION_THRESHOLD_SF6                            0x0C
+#define DETECTION_THRESHOLD_SF7_12                         0x0A                 // Reg default
+// Lora Preamble Length
+#define PREAMBLE_MSB                                       0x00                 // Preamble MSB = PREAMBLE_MSB + 4.25
+#define PREAMBLE_LSB                                       0x08   
+// Lora DioMapping2 Mode DIO5 and DIO4
+#define DIOMAPPING2_MODE                                   0x01                 // RegDioMapping2 DIO5=00, DIO4=01
+// Lora DioMapping1 Mode DIO3,DIO2,DIO1,DIO0
+#define DIOMAPPING1_TX                                     0x41                 // DIO0=01, DIO1=00, DIO2=00, DIO3=01
+#define DIOMAPPING1_RX                                     0x01                 // DIO0=00, DIO1=00, DIO2=00, DIO3=01
+// Invert IQ 
+#define INVERT_NORMAL                                      0x27
+#define INVERT_IQ                                          0x67
+// Clear IrqFlags
+#define IRQFLAG_CLEAR                                      0xFF
+// High power + 20 dBm
+#define PADAC_HIGH                                         0x87
+#define PADAC_NORMAL                                       0x84
+// FHSS enable
+#define FHSS_ENABLE                                        0x00
+#define FHSS_DISABLE                                       0xFF
+// Payload Length
+#define NUM_PAYLOAD                                        20
 /*********************************************************/
-//command
-/*********************************************************/
-extern u8 key_flag;
-/*{
-	uchar	:key1_shot_down;
-	uchar	:key1_long_down;
-	uchar	:key2_short_down;
-	uchar	:key2_long_down
-	uchar	:
-	uchar	:;
-	uchar	:;
-	uchar	;
-}*/
+
+typedef enum 
+{
+  STDBY,
+  SLEEP,
+  TX,
+  RX
+}Lora_Status;
+
+typedef struct 
+{
+  u8 TimeOutMsb : 2;
+  u8 TimeOutLsb;
+}Lora_RxTimeOut;
+
+typedef struct
+{
+  u8                    Frequency;
+  u8                    OutputPower;
+  u8                    SpreadFactor;
+  u8                    BandWidth;
+  u8                    CodingRate;
+  u8                    CRCheck;
+  Lora_RxTimeOut        RxTimeOut;
+  Lora_Status           status;
+}Lora_HandleTypeDef;
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////
 extern u8 temp;
 extern u8 mode;
 extern u8 Freq_Sel;
@@ -213,15 +226,17 @@ extern void sx1276_7_8_Reset(void);
 extern void sx1276_7_8_Config_Init(void);
 extern void sx1276_7_8_Config_clk(void);
 
-extern u8 Switch_To_Tx(void);
-extern u8 Switch_To_Rx(void);
+extern bool Switch_To_Tx(void);
+extern bool Switch_To_Rx(void);
 extern void Switch_To_Standby();
 
-extern u8  sx1276_7_8Data[20];
+extern u8 sx1276_7_8Data[20];
 extern u8 RxData[3][20];
-extern u8 Send_Tx_Packet(u8* buf, u8 length);
-extern u8 Indicate_Rx_Packet(char* slave_id, u8 m_or_s);
-extern u8 Read_Rx_Packet(char* Rx_Packet, u8 length, char* slave_id, u8 m_or_s);
+extern bool Send_Tx_Packet(u8* buf, u8 length);
+extern bool Indicate_Rx_Packet(char* slave_id, u8 m_or_s);
+extern bool Read_Rx_Packet(char* Rx_Packet, u8 length, char* slave_id, u8 m_or_s);
 
 extern s8 sx1276_7_8_LoRaReadRSSI(void);
+extern Lora_HandleTypeDef Lora;
+extern void Lora_1278_Init(void);
 #endif /* SX1276_7_8_H_ */

@@ -10,12 +10,18 @@
 #include "stdio.h"
 LoraMaster myLoraMaster;
 
-void Send_Broadcast_Data(char* data){
+/**********************************************************
+**Name:     Send_Broadcast_Data
+**Function: Send_Broadcast_Data
+**Input:    data to send in CHAR*
+**Output:   none
+**********************************************************/
+void Send_Broadcast_Data(char* data){  
   u8 tx_b[PACKET_LENGTH];
   u8 Tx_Packet_b[PACKET_LENGTH];
   HAL_Delay(TIME_BETWEEN_DATA_SENT);                            			
   sprintf((char*)tx_b,"%s\n", data);		
-  sprintf((char*)Tx_Packet_b, "Data sent: %s\n\n",tx_b);														
+  sprintf((char*)Tx_Packet_b, "Data sent: all\n\n");														
   printUSB((char*)Tx_Packet_b);
   Switch_To_Tx();																											
   Send_Tx_Packet((u8*)tx_b, PACKET_LENGTH);																								
@@ -27,6 +33,12 @@ void Send_Broadcast_Data(char* data){
   }
 }
 
+/**********************************************************
+**Name:     Send_Unicast_Data
+**Function: Send_Unicast_Data
+**Input:    data to send in CHAR*
+**Output:   none
+**********************************************************/
 void Send_Unicast_Data(){
   u8 tx_u[PACKET_LENGTH];
   u8 Tx_Packet_u[PRINTUSB_LENGTH];
@@ -58,9 +70,15 @@ void Send_Unicast_Data(){
   myLoraMaster.sent = ALREADY_SENT;
 }
 
+/**********************************************************
+**Name:     Master_Send_Data
+**Function: Master_Send_Data
+**Input:    none
+**Output:   none
+**********************************************************/
 void Master_Send_Data(){
   if(HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_5) == 1){
-    Send_Broadcast_Data("all");
+    Send_Broadcast_Data("abb");
   }
   else if(HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_6) == 1 || HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_7) == 1 
           || HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_8) == 1 || HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_9) == 1){
@@ -70,11 +88,23 @@ void Master_Send_Data(){
   }      
 }
 
+/**********************************************************
+**Name:     Start_Timer
+**Function: Start_Timer
+**Input:    function to call when timeout and time
+**Output:   none
+**********************************************************/
 void Start_Timer(SW_TIMER_CALLBACK function, u32 time){
   SW_TIMER_CREATE_FunCallBack(SW_TIMER1, time, function);
   SW_TIMER_START(SW_TIMER1);
 }
 
+/**********************************************************
+**Name:     Receive_Data
+**Function: Receive_Data
+**Input:    none
+**Output:   none
+**********************************************************/
 void Receive_Data(){
   myLoraMaster.uni_sent = ALREADY_SENT;
   u8 store_packet[PACKET_LENGTH];
@@ -93,6 +123,12 @@ void Receive_Data(){
   printUSB(myLoraMode.strBuf);	  
 }
 
+/**********************************************************
+**Name:     Master_Receive_Data
+**Function: Master_Receive_Data
+**Input:    none
+**Output:   none
+**********************************************************/
 void Master_Receive_Data(){
   if(myLoraMode.flag_timer == 0){
     SW_TIMER_CALLBACK callback_function = fun1;
