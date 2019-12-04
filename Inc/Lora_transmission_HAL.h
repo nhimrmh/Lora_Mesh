@@ -23,7 +23,7 @@
 #define BROADCAST_CHARACTER "a"
 #define SLAVE_IS_RECEIVING 1
 #define MASTER_IS_RECEIVING 0
-
+#define printUSB(x) CDC_Transmit_FS((uint8_t*)x,strlen((char*)x))
 ///////////////////////////////////////////////// LoRa mode //////////////////////////////////////////////////
 //Error Coding rate (CR)setting
 #define CR_4_5

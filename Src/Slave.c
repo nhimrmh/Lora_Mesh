@@ -7,8 +7,9 @@
 #include "Slave.h"
 #include "logging.h"
 #include "mainApp.h"
-#define printUSB(x) CDC_Transmit_FS((uint8_t*)x,strlen((char*)x))
-extern s8 rssi_value;
+#include "Master.h"
+
+LoraSlave myLoraSlave;
 
 void Delay_By_Id(char* slave_id){
   HAL_Delay(BROADCAST_DELAY_TIME * atoi(slave_id));
@@ -16,23 +17,23 @@ void Delay_By_Id(char* slave_id){
 
 void Slave_Send_Response_Broadcast(char* slave_id){
   Delay_By_Id(slave_id);                            			
-  sprintf((char*)sx1276_7_8Data,"%s_%d\n", slave_id, rssi_value);		
+  sprintf((char*)sx1276_7_8Data,"%s_%d\n", slave_id, myLoraSlave.rssi_value);		
   sprintf((char*)(myTxPacket.Data), "Data sent: %s", (char*)sx1276_7_8Data);														
   printUSB((char*)(myTxPacket.Data));
   Switch_To_Tx();																											
-  Send_Tx_Packet((u8*)sx1276_7_8Data, 20);																								
+  Send_Tx_Packet((u8*)sx1276_7_8Data, PACKET_LENGTH);																								
   Switch_To_Rx();																			
-  myLoraMode.mode = 1;	
+  myLoraMode.mode = SLAVE_RX;	
 }
 
 void Slave_Send_Response_Unicast(char* slave_id){  			
-  sprintf((char*)sx1276_7_8Data,"%s_%d\n", slave_id, rssi_value);		
+  sprintf((char*)sx1276_7_8Data,"%s_%d\n", slave_id, myLoraSlave.rssi_value);		
   sprintf((char*)(myTxPacket.Data), "Data sent: %s", (char*)sx1276_7_8Data);														
   printUSB((char*)(myTxPacket.Data));
   Switch_To_Tx();																											
-  Send_Tx_Packet((u8*)sx1276_7_8Data, 20);																								
+  Send_Tx_Packet((u8*)sx1276_7_8Data, PACKET_LENGTH);																								
   Switch_To_Rx();																			
-  myLoraMode.mode = 1;	
+  myLoraMode.mode = SLAVE_RX;	
 }
 
 void Slave_Send_Response(u8 uni_or_broad, char* slave_id){
@@ -45,23 +46,23 @@ void Slave_Send_Response(u8 uni_or_broad, char* slave_id){
 }
 
 void Slave_Receive_Unicast(){
-  rssi_value = sx1276_7_8_LoRaReadRSSI();						
+  myLoraSlave.rssi_value = sx1276_7_8_LoRaReadRSSI();						
   sprintf(myLoraMode.strBuf,"Data received: %s\n",(char*)(RxData + myLoraPtr.current_ptr));		
   myLoraPtr.current_ptr++;
-  if(myLoraPtr.current_ptr == MAX_QUEUE_LENGTH) myLoraPtr.current_ptr = 0;
+  if(myLoraPtr.current_ptr == LAST_POSITION_OF_QUEUE) myLoraPtr.current_ptr = FIRST_POSITION_OF_QUEUE;
   printUSB(myLoraMode.strBuf);										
-  myLoraMode.mode = 0;                                                        
-  myLoraMode.uni_or_broad = 0;                                
+  myLoraMode.mode = SLAVE_TX;                                                        
+  myLoraMode.uni_or_broad = UNICAST;                                
 }
 
 void Slave_Receive_Broadcast(){
-  rssi_value = sx1276_7_8_LoRaReadRSSI();						
+  myLoraSlave.rssi_value = sx1276_7_8_LoRaReadRSSI();						
   sprintf(myLoraMode.strBuf,"Data received: %s\n",(char*)(RxData + myLoraPtr.current_ptr));		
   myLoraPtr.current_ptr++;
-  if(myLoraPtr.current_ptr == MAX_QUEUE_LENGTH) myLoraPtr.current_ptr = 0;
+  if(myLoraPtr.current_ptr == LAST_POSITION_OF_QUEUE) myLoraPtr.current_ptr = FIRST_POSITION_OF_QUEUE;
   printUSB(myLoraMode.strBuf);										
-  myLoraMode.mode = 0;             
-  myLoraMode.uni_or_broad = 1;                                
+  myLoraMode.mode = SLAVE_TX;             
+  myLoraMode.uni_or_broad = BROADCAST;                                
 }
 
 void Slave_Receive_Data(char* slave_id){
@@ -70,7 +71,7 @@ void Slave_Receive_Data(char* slave_id){
     if(strncmp((char*)(RxData + myLoraPtr.current_ptr),slave_id,1) == 0){																
         Slave_Receive_Unicast();
     }
-    else if(strncmp((char*)(RxData + myLoraPtr.current_ptr),BROADCAST_CHARACTER,1) == 0){																
+    else if(strncmp((char*)(RxData + myLoraPtr.current_ptr),"a",1) == 0){																
         Slave_Receive_Broadcast();
     }
   }

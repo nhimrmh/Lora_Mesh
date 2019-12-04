@@ -8,11 +8,7 @@
 #include "main.h"
 #include "mainApp.h"
 #include "Master.h"
-extern u8 flag_timer;
-extern u8 key1_count;
-extern u8 slave_count;
-extern u8 uni_or_broad;
-extern u8 uni_sent;
+
 typedef struct
 {
     u32 countdown;
@@ -125,7 +121,7 @@ void fun1(void)
 {
   if(myLoraMode.uni_or_broad == 1){
     myLoraMode.slave_count = 0;
-    flag_timer = 0;
+    myLoraMode.flag_timer = 0;
     myLoraMode.mode = 5;	
   }
   else{

@@ -93,7 +93,7 @@ void sx1276_7_8_Config_Init(void);
 
 void sx1276_7_8_Reset(void){
 	HAL_GPIO_WritePin(Reset_GPIO_Port,Reset_Pin,GPIO_PIN_RESET);
-	HAL_Delay(10 * 100000);
+	HAL_Delay(10);
 	HAL_GPIO_WritePin(Reset_GPIO_Port,Reset_Pin,GPIO_PIN_SET);
 }
 
@@ -349,7 +349,7 @@ u8 Wait_Tx_Done(){
 void sx1276_7_8_Config_Init(void)
 {
   sx1276_7_8_Sleep();                                      //Change modem mode Must in Sleep mode
-	HAL_Delay(15 * 100000); 
+	HAL_Delay(15); 
 	sx1276_7_8_EntryLoRa();	
 
 	BurstWrite(LR_RegFrMsb,sx1276_7_8FreqTbl[Freq_Sel],3);  //setting frequency parameter
